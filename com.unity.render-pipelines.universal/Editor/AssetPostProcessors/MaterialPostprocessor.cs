@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor.Rendering.Universal.ShaderGUI;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using Object = UnityEngine.Object;
 
 namespace UnityEditor.Rendering.Universal
 {
@@ -285,6 +286,26 @@ namespace UnityEditor.Rendering.Universal
             RenameColor("_Color", "_BaseColor");
             RenameFloat("_GlossyReflections", "_EnvironmentReflections");
         }
+
+        public override void Convert(Material srcMaterial, Material dstMaterial)
+        {
+            var defaultMaterial = new Material(Shader.Find(ShaderUtils.GetShaderPath(ShaderPathID.Lit)));
+            try
+            {
+                var hasChangedBaseMap = srcMaterial.HasProperty("_BaseMap") && srcMaterial.GetTexture("_BaseMap") != defaultMaterial.GetTexture("_BaseMap");
+                var hasChangedBaseColor = srcMaterial.HasProperty("_BaseColor") && srcMaterial.GetColor("_BaseColor") != defaultMaterial.GetColor("_BaseColor");
+                var hasChangedEnvironmentReflections = srcMaterial.HasProperty("_EnvironmentReflections") && srcMaterial.GetFloat("_EnvironmentReflections") != defaultMaterial.GetFloat("_EnvironmentReflections");
+
+                if (!hasChangedBaseMap && !hasChangedBaseColor && !hasChangedEnvironmentReflections)
+                {
+                    base.Convert(srcMaterial, dstMaterial);
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(defaultMaterial);
+            }
+        }
     }
 
     internal class UnlitUpdaterV1 : MaterialUpgrader
@@ -313,6 +334,25 @@ namespace UnityEditor.Rendering.Universal
             RenameTexture("_MainTex", "_BaseMap");
             RenameColor("_Color", "_BaseColor");
         }
+
+        public override void Convert(Material srcMaterial, Material dstMaterial)
+        {
+            var defaultMaterial = new Material(Shader.Find(ShaderUtils.GetShaderPath(ShaderPathID.Unlit)));
+            try
+            {
+                var hasChangedBaseMap = srcMaterial.HasProperty("_BaseMap") && srcMaterial.GetTexture("_BaseMap") != defaultMaterial.GetTexture("_BaseMap");
+                var hasChangedBaseColor = srcMaterial.HasProperty("_BaseColor") && srcMaterial.GetColor("_BaseColor") != defaultMaterial.GetColor("_BaseColor");
+
+                if (!hasChangedBaseMap && !hasChangedBaseColor)
+                {
+                    base.Convert(srcMaterial, dstMaterial);
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(defaultMaterial);
+            }
+        }
     }
 
     internal class SimpleLitUpdaterV1 : MaterialUpgrader
@@ -328,6 +368,30 @@ namespace UnityEditor.Rendering.Universal
             RenameColor("_Color", "_BaseColor");
             RenameFloat("_SpecSource", "_SpecularHighlights");
             RenameFloat("_Shininess", "_Smoothness");
+        }
+
+        public override void Convert(Material srcMaterial, Material dstMaterial)
+        {
+            var defaultMaterial = new Material(Shader.Find(ShaderUtils.GetShaderPath(ShaderPathID.SimpleLit)));
+            try
+            {
+                var hasChangedBaseMap = srcMaterial.HasProperty("_BaseMap") && srcMaterial.GetTexture("_BaseMap") != defaultMaterial.GetTexture("_BaseMap");
+                var hasChangedSpecGlossMap = srcMaterial.HasProperty("_SpecGlossMap") && srcMaterial.GetTexture("_SpecGlossMap") != defaultMaterial.GetTexture("_SpecGlossMap");
+                var hasChangedBaseColor = srcMaterial.HasProperty("_BaseColor") && srcMaterial.GetColor("_BaseColor") != defaultMaterial.GetColor("_BaseColor");
+                var hasChangedSpecColor = srcMaterial.HasProperty("_SpecColor") && srcMaterial.GetColor("_SpecColor") != defaultMaterial.GetColor("_SpecColor");
+                var hasChangedSpecularHighlights = srcMaterial.HasProperty("_SpecularHighlights") && srcMaterial.GetFloat("_SpecularHighlights") != defaultMaterial.GetFloat("_SpecularHighlights");
+                var hasChangedSmoothness = srcMaterial.HasProperty("_Smoothness") && srcMaterial.GetFloat("_Smoothness") != defaultMaterial.GetFloat("_Smoothness");
+                var hasChangedSmoothnessSource = srcMaterial.HasProperty("_SmoothnessSource") && srcMaterial.GetFloat("_SmoothnessSource") != defaultMaterial.GetFloat("_SmoothnessSource");
+
+                if (!hasChangedBaseMap && !hasChangedSpecGlossMap && !hasChangedBaseColor && !hasChangedSpecColor && !hasChangedSpecularHighlights && !hasChangedSmoothness && !hasChangedSmoothnessSource)
+                {
+                    base.Convert(srcMaterial, dstMaterial);
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(defaultMaterial);
+            }
         }
 
         public static void UpgradeToSimpleLit(Material material)
@@ -381,6 +445,27 @@ namespace UnityEditor.Rendering.Universal
                     break;
                 case ShaderPathID.ParticlesUnlit:
                     break;
+            }
+        }
+
+        public override void Convert(Material srcMaterial, Material dstMaterial)
+        {
+            var defaultMaterial = new Material(Shader.Find(ShaderUtils.GetShaderPath(ShaderPathID.SimpleLit)));
+            try
+            {
+                var hasChangedBaseMap = srcMaterial.HasProperty("_BaseMap") && srcMaterial.GetTexture("_BaseMap") != defaultMaterial.GetTexture("_BaseMap");
+                var hasChangedBaseColor = srcMaterial.HasProperty("_BaseColor") && srcMaterial.GetColor("_BaseColor") != defaultMaterial.GetColor("_BaseColor");
+                var hasChangedFlipbookBlending = srcMaterial.HasProperty("_FlipbookBlending") && srcMaterial.GetFloat("_FlipbookBlending") != defaultMaterial.GetFloat("_FlipbookBlending");
+                var hasChangedSmoothness = srcMaterial.HasProperty("_Smoothness") && srcMaterial.GetFloat("_Smoothness") != defaultMaterial.GetFloat("_Smoothness");
+
+                if (!hasChangedBaseMap && !hasChangedBaseColor && !hasChangedFlipbookBlending && !hasChangedSmoothness)
+                {
+                    base.Convert(srcMaterial, dstMaterial);
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(defaultMaterial);
             }
         }
     }
